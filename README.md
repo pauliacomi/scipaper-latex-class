@@ -1,0 +1,1 @@
+Custom Latex class I use for preprints and the like
