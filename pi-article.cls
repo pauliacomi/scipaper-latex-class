@@ -151,6 +151,7 @@
 % The SIunitx package enables the \SI{}{} command.
 \RequirePackage{siunitx}
 \sisetup{detect-weight=true, detect-family=true}
+\sisetup{range-units=single, range-phrase=--} % brief SIrange
 
 % The mchem package for formula subscripts using \ce{}
 \RequirePackage[version=4]{mhchem}
@@ -169,7 +170,7 @@
 %% Moves references after punctuation
 \RequirePackage{natmove}
 \renewcommand*{\natmovechars}{.}
-    
+
 %% Use pi-bib.bst if available else fall back to unsrtnat
 \setlength{\bibsep}{0.0pt}
 \IfFileExists{templates/pi/pi-bib.bst}{
@@ -181,6 +182,7 @@
     \PackageWarning{pi-bib}{templates/pi/pi-bib.bst not found; must specify manually}
 }}
 \renewcommand\bibfont{\normalfont\sffamily\fontsize{6}{8}\selectfont} % set font to be sans serif
+\renewcommand{\refname}{References} % Use "References" as title
 
 \renewcommand\@biblabel[1]{ #1.} % Remove brackets from label
 \def\tagform@#1{\maketag@@@{\bfseries(\ignorespaces#1\unskip\@@italiccorr)}}
