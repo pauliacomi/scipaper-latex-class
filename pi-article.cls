@@ -5,6 +5,11 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{pi-article}[03/09/2020, v3.1]
 
+% Option for type of article
+\newcommand{\arttype}{ARTICLE}
+\DeclareOption{commun}{\renewcommand{\arttype}{COMMUNICATION}}
+\DeclareOption{review}{\renewcommand{\arttype}{REVIEW}}
+
 % Option for SI
 \newif\if@switchSI
 \DeclareOption{SI}{\@switchSItrue}
@@ -13,7 +18,7 @@
 \newif\if@switchlineno
 \DeclareOption{lineno}{\@switchlinenotrue}
 
-% Option for affiliation
+% Option for affiliation location
 \newif\if@switchaffil \@switchaffilfalse
 \DeclareOption{affiltop}{\@switchaffiltrue}
 
@@ -21,8 +26,8 @@
 \newif\if@switchtoc \@switchtocfalse
 \DeclareOption{toc}{\@switchtoctrue}
 
-\DeclareOption*{\PassOptionsToClass{\CurrentOption}{extarticle}}
-\ProcessOptions*\relax
+\DeclareOption*{\PassOptionsToClass{\CurrentOption}{extarticle}}  % pass other options to base class
+\ProcessOptions*\relax                                            % finish options
 \LoadClass{extarticle}
 
 %% Options for element switching
@@ -364,6 +369,7 @@ x}
 \fancypagestyle{plain}{%
     \fancyhf{}
     \ifthenelse{\boolean{toprule}}{%
+        \fancyhead[L]{\Huge{\arttype}}
         \renewcommand{\headrulewidth}{3pt}%
     }{}
     \fancyfoot[R]{
@@ -487,7 +493,7 @@ x}
   }%
 }
 
-%% Manual adjustment to line up main content with line numbers
+%% Manual adjustment of vertical distance, useful for overall formatting
 \newlength\vert@adjust
 \newcommand\verticaladjustment[1]{\setlength{\vert@adjust}{#1}}
 
@@ -545,7 +551,7 @@ x}
 }
 {% else if complete paper
   %
-  \vskip10pt%
+  \vskip20pt%
   %
   {\raggedright\baselineskip=24pt\titlefont \@title\par}%
   %
