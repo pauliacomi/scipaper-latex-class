@@ -1,16 +1,18 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% pi-article.cls, v3.2
+% pi-article.cls, v4.0
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{pi-article}[03/09/2020, v3.1]
+\ProvidesClass{pi-article}[16/09/2020, v4.0]
+
+%%%%%%%%%%%%%%%%%%%%%% Class options and conditionals
 
 % Option for type of article
 \newcommand{\arttype}{ARTICLE}
 \DeclareOption{commun}{\renewcommand{\arttype}{COMMUNICATION}}
 \DeclareOption{review}{\renewcommand{\arttype}{REVIEW}}
 
-% Option for SI
+% Option for switching to SI format
 \newif\if@switchSI
 \DeclareOption{SI}{\@switchSItrue}
 
@@ -30,26 +32,27 @@
 \ProcessOptions*\relax                                            % finish options
 \LoadClass{extarticle}
 
-%% Options for element switching
+%% Options for individual element switching
 \RequirePackage{xifthen}
-\newboolean{shortintro}
-\newboolean{singlecolumn}
-\newboolean{toprule}
-\setboolean{toprule}{true}
+\newboolean{shortintro}           % will not include abstract in the title page
+\newboolean{singlecolumn}         % text will be laid out in a single column
+\newboolean{toprule}              % large line at the top
+\setboolean{toprule}{true}        % on by default
 
-% Switch for SI
+%%%%%%%%%%%%%%%%%%%%%% Global settings for SI format
+
 \if@switchSI
-\setboolean{toprule}{false}
-\setboolean{shortintro}{true}
-\setboolean{singlecolumn}{true}
-\def\thepage{S\arabic{page}}
-\renewcommand*\thefigure{S\arabic{figure}}
-\renewcommand*\thetable{S\arabic{table}}
-\renewcommand*\theequation{S\arabic{equation}}
-\AtBeginDocument{%
-    \renewcommand*\citenumfont[1]{S#1}%
-    \renewcommand*\bibnumfmt[1]{(S#1)}%
-}
+  \setboolean{toprule}{false}                         % no top rule
+  \setboolean{shortintro}{true}                       % no abstract
+  \setboolean{singlecolumn}{true}                     % single column
+  \def\thepage{S\arabic{page}}                        % pages as S1-SX
+  \renewcommand*\thefigure{S\arabic{figure}}          % Figures as Fig. S1
+  \renewcommand*\thetable{S\arabic{table}}            % Tables as Tbl. S1
+  \renewcommand*\theequation{S\arabic{equation}}      % Equations as Eq. S1
+  \AtBeginDocument{%                                  % Bibliographies as Ref. S1
+      \renewcommand*\citenumfont[1]{S#1}%
+      \renewcommand*\bibnumfmt[1]{(S#1)}%
+  }
 \fi
 
 %%%%%%%%%%%%%%%%%%%%%% Fonts and language
@@ -61,6 +64,16 @@
 % Microtype
 \AtEndOfClass{\RequirePackage{microtype}}
 
+%% Set up main page fonts
+\newcommand{\headerfont}{\fontfamily{lmss}\color{gray}\bfseries\sffamily\fontsize{16pt}{20pt}\selectfont}
+\newcommand{\footerfont}{\normalfont\sffamily\fontsize{7pt}{9pt}\selectfont}
+\newcommand{\titlefont}{\fontfamily{lmss}\bfseries\fontsize{22pt}{24pt}\selectfont}
+\newcommand{\subtitlefont}{\fontfamily{lmss}\bfseries\fontsize{15pt}{20pt}\selectfont}
+\newcommand{\contactfont}{\itshape\sffamily\fontsize{7pt}{9pt}\selectfont}
+\newcommand{\absfont}{\normalfont\sffamily\bfseries\fontsize{8pt}{11pt}\selectfont}
+\newcommand{\keywordsfont}{\normalfont\sffamily\fontsize{8pt}{11pt}\selectfont}
+\newcommand{\footnotefont}{\normalfont\sffamily\fontsize{7}{9}\selectfont}
+
 % AMS maths packages
 \RequirePackage{
   amsmath,
@@ -68,6 +81,9 @@
   amsthm,
   amssymb
 }
+
+%% Add bolding to math where needed
+\g@addto@macro\bfseries{\boldmath}
 
 % Encodings
 \RequirePackage{ifxetex,ifluatex}
@@ -94,51 +110,102 @@
   \setmainlanguage[]{english}
 \fi
 
-%%%%%%%%%%%%%%%%%%%%%% Graphics packages, tables and listings
+%%%%%%%%%%%%%%%%%%%%%% General pagination setup and tools
 
-\RequirePackage{graphicx}
-\RequirePackage{colortbl}
-\RequirePackage{changepage}
-\RequirePackage{afterpage}
-\RequirePackage{xcolor}
-\RequirePackage{tikz}
-\usetikzlibrary{svg.path}
-\usetikzlibrary{calc}
-\RequirePackage[framemethod=tikz]{mdframed}
+\RequirePackage[
+  a4paper,includeheadfoot,                    % paper size, head/foot included in geometry
+  % showframe,showcrop,                       % for debugging
+  top=25pt,bottom=35pt,                       % top/bottom
+  left=55pt,right=55pt,                       % left/right
+  marginparwidth=2cm,                         % margins (used for line numbers)
+  marginparsep=5pt,                           % margin separation
+  headheight=20pt,                            % header height
+  headsep=0pt,                                % text distance from header
+  footskip=25pt]{geometry}
 
-% Floats
-\RequirePackage{float}
-% For the floatbarrier macro
-\RequirePackage[section]{placeins}
-% Fixes for twocolumn floats
-\RequirePackage{dblfloatfix}
+\RequirePackage{etoolbox}                     % general utilities
+\RequirePackage{changepage}                   % change odd/even page at any point
+\RequirePackage{lastpage}                     % Refer to last page of the document
+\RequirePackage{afterpage}                    % execute a command on next page (useful for \clearpage flush)
+\RequirePackage{enumitem}                     % For reducing bullet list item separation
 
-% Better tables 
+\setlength{\columnsep}{13.5pt}                % Distance between the two columns of text
+\setlength{\parindent}{12pt}                  % Paragraph indent
+
+%%%%%%%%%%%%%%%%%%%%%% Figures, tables, equations and listings
+
+% Figures
+\RequirePackage{graphicx}                     % include pictures
+\RequirePackage{tikz}                         % drawing pictures
+\usetikzlibrary{svg.path}                     % TIKZ svg paths
+\usetikzlibrary{calc}                         % TIKZ calculations
+\RequirePackage[framemethod=tikz]{mdframed}   % breakable framed and coloured boxes
+
+%% Set document color scheme
+\RequirePackage{xcolor}                       % driver indepentent color extensions
+\definecolor{black50}{gray}{0.5}              % 50% black for hrules
+\definecolor{color0}{RGB}{0,0,0}              % Base
+\definecolor{color1}{RGB}{59,90,198}          % author email, doi
+
+% Tables 
 \RequirePackage{
-  longtable,
-  booktabs,
-  makecell,
-  array,
-  multirow,
-  tabularx
+  booktabs,                                   % overall nice table quality
+  array,                                      % better column and row definitions
+  longtable,                                  % for tables spanning multiple pages
+  makecell,                                   % multilined table cells
+  tabularx,                                   % width-expanding column (with 'x')
+  multirow,                                   % for multirow cells (with \\)
+  colortbl                                    % to add colours to table cells
 }
+% booktabs provide nice spacing, but rule widths and distances need modifying
+\setlength{\heavyrulewidth}{0.5pt}            % wide rule
+\setlength{\lightrulewidth}{0.5pt}            % light rule
+\setlength{\aboverulesep}{1.5pt}              % blank space above rules
+\setlength{\belowrulesep}{1.5pt}              % blank space below rules
+\setlength{\belowbottomsep}{5pt}              % blank space below whole table
+\AtBeginEnvironment{tabular}{%                % font inside tables will be small
+  \sffamily\fontsize{7.5}{10}\selectfont
+}
+%% command we can use to add some text e.g. below the table
+\newcommand{\addtabletext}[1]{{\setlength{\leftskip}{9pt}\fontsize{7}{9}\selectfont#1}}
 
-% Better captions 
-\RequirePackage[labelfont={bf,sf},%
-                labelsep=period,%
-                figurename=Fig.]{caption}
-
-% For subfigures
-\RequirePackage{subcaption}
-
-%% For sidecaptions
-\RequirePackage[rightcaption]{sidecap}
-
-% For code snippets
+% Code snippets/listings
 \RequirePackage{listings}
 
-% Lists
-\RequirePackage{enumitem} % For reducing bullet list item separation
+% Equations
+% placed in square brackets
+\renewcommand\tagform@[1]{\maketag@@@ {[\ignorespaces #1\unskip \@@italiccorr ]}}
+% For numbering just one line of an equation
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+
+%%%%%%%%%%%%%%%%%%%%%% Floats, subfloats and their captions
+
+\RequirePackage{float}                        % improved interface for floating objects
+\RequirePackage{dblfloatfix}                  % fixes for twocolumn floats
+\RequirePackage[section]{placeins}            % for the floatbarrier macro
+
+% distance between floats and text
+\setlength{\textfloatsep}{6pt \@plus 2.0pt \@minus 2.0pt}
+% distance between two floats
+\setlength{\floatsep}{8pt \@plus 2.0pt \@minus 2.0pt}
+
+% Better captions 
+\RequirePackage[
+  skip=3pt,                                   % vertical space between caption and figure
+  labelfont={bf,sf},                          % we bold the caption label
+  labelsep=colon,                             % periods after label (Fig. 1:)
+  figurename=Fig.,                            % figure will be abbreviated
+]{caption}
+% overall font types (excluding label)
+\DeclareCaptionFormat{fmt}{\normalfont\sffamily\fontsize{7}{9}\selectfont#1#2#3}
+\captionsetup*{format=fmt}                        % for figures
+\captionsetup*[table]{format=fmt,position=above}  % for tables
+
+% Subfigures
+\RequirePackage{subcaption}
+
+% Sidecaptions
+\RequirePackage[rightcaption]{sidecap}
 
 %%%%%%%%%%%%%%%%%%%%%% Utilities
 
@@ -155,29 +222,34 @@
 
 % The SIunitx package enables the \SI{}{} command.
 \RequirePackage{siunitx}
-\sisetup{detect-weight=true, detect-family=true}
-\sisetup{range-units=single, range-phrase=--} % brief SIrange
+\sisetup{
+  detect-weight=true,
+  detect-family=true,
+  range-units=single,       % brief SIrange
+  range-phrase=--           % and using lines
+}
 
 % The mchem package for formula subscripts using \ce{}
 \RequirePackage[version=4]{mhchem}
 
-%%%%%%%%%%%%%%%%%%%%%% Bibliography packages and settings
+%%%%%%%%%%%%%%%%%%%%%% Bibliography, footnotes and their settings
 
 % Natbib package for text references
 \RequirePackage[
-    numbers,
-    merge,
-    % round,
-    super,
+    numbers,                % numbers as references
+    merge,                  % merge multiple references in one
+    super,                  % superscript
     sort&compress
 ]{natbib}
-    
-%% Moves references after punctuation
-\RequirePackage{natmove}
-\renewcommand*{\natmovechars}{.}
 
-%% Use pi-bib.bst if available else fall back to unsrtnat
+% Moves references after punctuation
+\RequirePackage{natmove}
+\renewcommand*{\natmovechars}{.}  % only after full stop
+
+% Bibliography style
+%% No separation between references
 \setlength{\bibsep}{0.0pt}
+%% Use pi-bib.bst as a styla (if available) else fall back to unsrtnat
 \IfFileExists{templates/pi/pi-bib.bst}{
   \bibliographystyle{templates/pi/pi-bib}
 }{
@@ -186,12 +258,21 @@
 }{
     \PackageWarning{pi-bib}{templates/pi/pi-bib.bst not found; must specify manually}
 }}
-\renewcommand\bibfont{\normalfont\sffamily\fontsize{6}{8}\selectfont} % set font to be sans serif
-\renewcommand{\refname}{References} % Use "References" as title
+%% set Bibliography font to be sans serif
+\renewcommand\bibfont{\normalfont\sffamily\fontsize{6}{8}\selectfont} 
+%% Use "References" as title
+\renewcommand{\refname}{References} 
+%% Remove brackets from label
+\renewcommand\@biblabel[1]{ #1.}
 
-\renewcommand\@biblabel[1]{ #1.} % Remove brackets from label
-\def\tagform@#1{\maketag@@@{\bfseries(\ignorespaces#1\unskip\@@italiccorr)}}
-\renewcommand{\eqref}[1]{\textup{{\normalfont Eq.~(\ref{#1}}\normalfont)}}
+% Footnotes
+\RequirePackage[flushmargin,ragged,symbol*]{footmisc}
+\renewcommand*{\footnotelayout}{\footnotefont}
+\renewcommand{\footnoterule}{% Set the footnote hrule style
+  \kern -3pt
+  {\color{black50} \hrule width 72pt height 0.25pt}
+  \kern 2.5pt
+}
 
 %%%%%%%%%%%%%%%%%%%%%% References and bookmarks
 
@@ -199,56 +280,31 @@
 % To reference another document, in this case the SI
 \RequirePackage{xr, xr-hyper}
 
-%% Hyperlinking
+% Hyperlinking
 \RequirePackage[
-  colorlinks=true, 
+  colorlinks=true,
   allcolors=blue,
   pagebackref=false
 ]{hyperref}
+%% Set URL link color & font
+\renewcommand\UrlFont{\color{black}\sffamily}
 
-%% References
+% References
 \RequirePackage[
   capitalise,
   nameinlink,
 ]{cleveref}
+
+% Equation reference label has no brackets
 \creflabelformat{equation}{#2\textup{#1}#3}
+% Equation reference text is Eq.
+\renewcommand{\eqref}[1]{\textup{{\normalfont Eq.~(\ref{#1}}\normalfont)}}
 
 \RequirePackage{doi} % DOIs
-\RequirePackage[nottoc,numbib]{tocbibind} % References in TOC (for SI)
+\RequirePackage[nottoc,numbib]{tocbibind} % References section in TOC (for SI)
 
-%%%%%%%%%%%%%%%%%%%%%% 
-%%%%%%%%%%%%%%%%%%%%%% Setup
-%%%%%%%%%%%%%%%%%%%%%% General page setup
-
-\RequirePackage[
-  a4paper,includeheadfoot,%
-  % showframe,showcrop,%
-  top=45pt,bottom=35pt,%
-  left=55pt,right=55pt,%
-  marginparsep=5pt,%
-  marginparwidth=2cm,%
-  headheight=0pt,% No Header
-  headsep=10pt,%
-  footskip=25pt]{geometry}
-
-
-%%%%%%%%%%%%%%%%%%%%%% General font setup
-
-%% Set up main title page fonts 
-\newcommand{\headerfont}{\fontfamily{lmss}\color{gray}\bfseries\sffamily\fontsize{16pt}{20pt}\selectfont}
-\newcommand{\footerfont}{\normalfont\sffamily\fontsize{7pt}{9pt}\selectfont}
-\newcommand{\titlefont}{\fontfamily{lmss}\bfseries\fontsize{22pt}{24pt}\selectfont}
-\newcommand{\subtitlefont}{\fontfamily{lmss}\bfseries\fontsize{15pt}{20pt}\selectfont}
-\newcommand{\contactfont}{\itshape\sffamily\fontsize{7pt}{9pt}\selectfont}
-\newcommand{\absfont}{\normalfont\sffamily\bfseries\fontsize{8pt}{11pt}\selectfont}
-\newcommand{\keywordsfont}{\normalfont\sffamily\fontsize{8pt}{11pt}\selectfont}
-\newcommand{\footnotefont}{\normalfont\sffamily\fontsize{7}{9}\selectfont}
-
-%% Set URL link color & font
-\renewcommand\UrlFont{\color{black}\sffamily}
-
-%% Add bolding to math where needed
-\g@addto@macro\bfseries{\boldmath}
+%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%% Other Setup
 
 %%%%%%%%%%%%%%%%%%%%%% Author and affiliation
 
@@ -265,52 +321,7 @@
 \renewcommand\AB@affilsepx{\newline\protect\Affilfont}
 \renewcommand\Authands{, and }
 
-%%%%%%%%%%%%%%%%%%%%%% Footnotes
-
-\RequirePackage[flushmargin,ragged,symbol*]{footmisc}
-\renewcommand*{\footnotelayout}{\footnotefont}
-\renewcommand{\footnoterule}{% Set the footnote hrule style
-  \kern -3pt
-  {\color{black50} \hrule width 72pt height 0.25pt}
-  \kern 2.5pt
-}
-
-%%%%%%%%%%%%%%%%%%%%%% Graphics, tables etc
-
-%% Graphics, tables and other formatting
-\setlength{\columnsep}{13.5pt} % Distance between the two columns of text
-\setlength{\parindent}{12pt} % Paragraph indent
-
-%% Set document color scheme
-\definecolor{black50}{gray}{0.5} % 50% black for hrules
-\definecolor{color0}{RGB}{0,0,0} % Base
-\definecolor{color1}{RGB}{59,90,198} % author email, doi
-
-%% Figure style
-\setlength{\textfloatsep}{6pt plus 2.0pt minus 2.0pt}
-\setlength{\floatsep}{8pt plus 2.0pt minus 2.0pt}
-\DeclareCaptionFormat{fmt}{\normalfont\sffamily\fontsize{7}{9}\selectfont#1#2#3}
-\captionsetup*{format=fmt, skip=3pt}
-
-%% Table style
-\RequirePackage{etoolbox}
-\captionsetup*[table]{format=fmt,position=above}
-% booktabs provide nice spacing, but rule widths and distances need fixing
-\setlength{\heavyrulewidth}{0.5pt}
-\setlength{\lightrulewidth}{0.5pt}
-\setlength{\aboverulesep}{1.5pt}
-\setlength{\belowrulesep}{1.5pt}
-\setlength{\belowbottomsep}{10pt}
-\AtBeginEnvironment{tabular}{%
-  \sffamily\fontsize{7.5}{10}\selectfont
-}
-\newcommand{\addtabletext}[1]{{\setlength{\leftskip}{9pt}\fontsize{7}{9}\selectfont#1}}
-
-%% Equation numbering - use square brackets
-\renewcommand\tagform@[1]{\maketag@@@ {[\ignorespaces #1\unskip \@@italiccorr ]}}
-
-%% For numbering just one line of an equation
-\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+%%%%%%%%%%%%%%%%%%%%%% Author and paper metadata
 
 %% ORCID logo
 \definecolor{orcidlogocol}{HTML}{A6CE39}
@@ -324,13 +335,13 @@
 x}
 
 %% Article meta data additional fields
-\newcommand{\contact}[1]{\def\@contact{#1}}
-\newcommand{\equalcontrib}[1]{\def\@equalcontrib{#1}}
-\newcommand{\pubdoi}[1]{\def\@pubdoi{#1}}
-\newcommand{\leadauthor}[1]{\def\@leadauthor{#1}}
-\newcommand{\keywords}[1]{\def\@keywords{#1}}
-\newcommand{\matmethods}[1]{\def\@matmethods{#1}}
-\newcommand{\acknow}[1]{\def\@acknow{#1}}
+\newcommand{\pubdoi}[1]{\def\@pubdoi{#1}}                     % publication DOI
+\newcommand{\keywords}[1]{\def\@keywords{#1}}                 % keywords
+\newcommand{\sep}[0]{; }                                      % keyword separator
+\newcommand{\contact}[1]{\def\@contact{#1}}                   % contact author
+\newcommand{\leadauthor}[1]{\def\@leadauthor{#1}}             % lead (first) author
+\newcommand{\equalcontrib}[1]{\def\@equalcontrib{#1}}         % equal contribution switch
+\newcommand{\acknow}[1]{\def\@acknow{#1}}                     % ORCID
 \newcommand{\orcid}[1]{
   \href{https://orcid.org/#1}{\mbox{
     \begin{tikzpicture}[overlay,remember picture]
@@ -341,47 +352,49 @@ x}
       \pic at (B) {orcidlogo};
     \end{tikzpicture}
     }{}}}
-\newcommand{\sep}[0]{; }
 
 %%%%%%%%%%%%%%%%%%%%%% Headers and footers
 
 %% Fancyhdr styling
 \RequirePackage{fancyhdr}  % custom headers/footers
-\RequirePackage{lastpage}  % Number of pages in the document
-\pagestyle{fancy}          % Set pagestyle to all 
+\pagestyle{fancy}          % Set all pagestyle to fancy
 
 % Clear everything
 \fancyhf{}
 
 % Headers
-\renewcommand{\headrulewidth}{0pt}% % No header rule
-% \fancyhead[]{} %etc
+\renewcommand{\headrulewidth}{0pt}                                      % No header rule normally
 
 % Footers
-\renewcommand{\footrulewidth}{0pt}% % No footer rule
-\fancyfoot[R]{
-  \footerfont\textit{Preprint}\hspace{7pt}|%
-  \hspace{7pt}\textbf{\today}\hspace{7pt}|%
-  \hspace{7pt}\textbf{\thepage}}
-\fancyfoot[L]{\footerfont\@ifundefined{@leadauthor}{}{\@leadauthor}\ifnum \value{authors} > 1\textit{ et al.}\fi}
+\renewcommand{\footrulewidth}{0pt}                                      % No footer rule normally
+\fancyfoot[R]{%                                                         % footer right side
+  \footerfont\textit{Preprint}\hspace{7pt}|%                            % add preprint text
+  \hspace{7pt}\textbf{\today}\hspace{7pt}|%                             % add date
+  \hspace{7pt}\textbf{\thepage}}                                        % add page number
+\fancyfoot[L]{%                                                         % footer left side
+\footerfont\@ifundefined{@leadauthor}{}{\@leadauthor}%                  % lead author name
+\ifnum \value{authors} > 1\textit{ et al.}\fi%                          % and et.al.
+}
 
-% Redefining plain style (for title page)
+% Modifying the plain style (applied automatically with title page)
 \fancypagestyle{plain}{%
-    \fancyhf{}
-    \ifthenelse{\boolean{toprule}}{%
-        \fancyhead[L]{\Huge{\arttype}}
+    \fancyhf{}                                                          % clear everything
+    \ifthenelse{\boolean{toprule}}{%                                    % if SI, we add a top rule
+        \fancyhead[L]{%                                                 % Add article type and rule
+          \colorbox{black}{\parbox{18em}{\centering\color{white}\subtitlefont{\arttype}}}}
         \renewcommand{\headrulewidth}{3pt}%
     }{}
-    \fancyfoot[R]{
-      \footerfont\textit{Preprint}\hspace{7pt}|%
-      \hspace{7pt}\textbf{\today}\hspace{7pt}|%
-      \hspace{7pt}\textbf{\thepage\textendash\pageref{LastPage}}}
-    \fancyfoot[L]{\footerfont\@ifundefined{@pubdoi}{}{DOI: \@pubdoi}}
+    \fancyfoot[R]{                                                      % footer right side
+      \footerfont\textit{Preprint}\hspace{7pt}|%                        % we also add preprint as text
+      \hspace{7pt}\textbf{\today}\hspace{7pt}|%                         % add date
+      \hspace{7pt}\textbf{\thepage\textendash\pageref{LastPage}}}       % add page number
+    \fancyfoot[L]{\footerfont\@ifundefined{@pubdoi}{}{%                 % footer left side
+      \href{https://dx.doi.org/\@pubdoi}{DOI: \@pubdoi}}}               % add DOI + hyperlink
 }
 
 %%%%%%%%%%%%%%%%%%%%%% Line numbers
 
-% Use footer routine for line numbers
+% Check switch for line numbers
 \if@switchlineno
   \ifthenelse{\boolean{singlecolumn}}{
     \RequirePackage{lineno}
@@ -397,7 +410,6 @@ x}
 %% Section/subsection/paragraph set-up
 \RequirePackage[explicit]{titlesec}
 \setcounter{secnumdepth}{5}
-% \renewcommand{\thesubsection}{\Alph{subsection}}
 
 \titleformat{\section}
   {\large\sffamily\bfseries}
@@ -427,7 +439,7 @@ x}
   {\sffamily\small\bfseries}
   {}
   {0em}
-  {#1} 
+  {#1}
 \titlespacing*{\section}{0pc}{3ex \@plus4pt \@minus3pt}{5pt}
 \titlespacing*{\subsection}{0pc}{2.5ex \@plus3pt \@minus2pt}{2pt}
 \titlespacing*{\subsubsection}{0pc}{2ex \@plus2.5pt \@minus1.5pt}{2pt}
@@ -521,7 +533,6 @@ x}
   %
   \vskip3pt
 }
-
 
 %%%% Custom title page
 \renewcommand{\@maketitle}{%
