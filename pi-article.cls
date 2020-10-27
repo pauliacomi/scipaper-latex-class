@@ -33,18 +33,18 @@
 \LoadClass{extarticle}
 
 %% Options for individual element switching
-\RequirePackage{xifthen}
-\newboolean{shortintro}           % will not include abstract in the title page
-\newboolean{singlecolumn}         % text will be laid out in a single column
-\newboolean{toprule}              % large line at the top
-\setboolean{toprule}{true}        % on by default
+\RequirePackage{etoolbox}         % general utilities
+\newtoggle{shortintro}            % will not include abstract in the title page
+\newtoggle{singlecolumn}          % text will be laid out in a single column
+\newtoggle{toprule}               % large line at the top
+\toggletrue{toprule}              % on by default
 
 %%%%%%%%%%%%%%%%%%%%%% Global settings for SI format
 
 \if@switchSI
-  \setboolean{toprule}{false}                         % no top rule
-  \setboolean{shortintro}{true}                       % no abstract
-  \setboolean{singlecolumn}{true}                     % single column
+  \togglefalse{toprule}                               % no top rule
+  \toggletrue{shortintro}                             % no abstract
+  \toggletrue{singlecolumn}                           % single column
   \def\thepage{S\arabic{page}}                        % pages as S1-SX
   \renewcommand*\thefigure{S\arabic{figure}}          % Figures as Fig. S1
   \renewcommand*\thetable{S\arabic{table}}            % Tables as Tbl. S1
@@ -123,7 +123,6 @@
   headsep=0pt,                                % text distance from header
   footskip=25pt]{geometry}
 
-\RequirePackage{etoolbox}                     % general utilities
 \RequirePackage{changepage}                   % change odd/even page at any point
 \RequirePackage{lastpage}                     % Refer to last page of the document
 \RequirePackage{afterpage}                    % execute a command on next page (useful for \clearpage flush)
@@ -379,7 +378,7 @@ x}
 % Modifying the plain style (applied automatically with title page)
 \fancypagestyle{plain}{%
     \fancyhf{}                                                          % clear everything
-    \ifthenelse{\boolean{toprule}}{%                                    % if SI, we add a top rule
+    \iftoggle{toprule}{%                                    % if SI, we add a top rule
         \fancyhead[L]{%                                                 % Add article type and rule
           \colorbox{black}{\parbox{18em}{\centering\color{white}\subtitlefont{\arttype}}}}
         \renewcommand{\headrulewidth}{3pt}%
@@ -396,7 +395,7 @@ x}
 
 % Check switch for line numbers
 \if@switchlineno
-  \ifthenelse{\boolean{singlecolumn}}{
+  \iftoggle{singlecolumn}{
     \RequirePackage{lineno}
   }{% use lineno in switch mode if doublecolumn
     \RequirePackage[switch]{lineno}
@@ -536,7 +535,7 @@ x}
 
 %%%% Custom title page
 \renewcommand{\@maketitle}{%
-\ifthenelse{\boolean{shortintro}}
+\iftoggle{shortintro}
 {% if short intro i.e. SI
   % patch command to center section
   \patchcmd{\@author}{\raggedright}{\centering}{}{}
