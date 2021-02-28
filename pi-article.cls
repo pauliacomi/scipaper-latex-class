@@ -259,10 +259,14 @@
     \PackageWarning{pi-bib}{templates/pi/pi-bib.bst not found; must specify manually}
     \bibliographystyle{unsrt}
 }}
-%% set Bibliography font to be sans serif
-\renewcommand\bibfont{\normalfont\sffamily\fontsize{6}{8}\selectfont} 
+%% set Bibliography font
+\renewcommand\bibfont{\normalfont\sffamily\fontsize{6}{8}\selectfont}
 %% Use "References" as title
+\renewcommand{\bibname}{References}
 \renewcommand{\refname}{References}
+\AtEndOfClass{
+  \renewcommand{\tocbibname}{References}
+}
 %% Remove brackets from label
 \renewcommand\@biblabel[1]{ #1.}
 
@@ -302,7 +306,7 @@
 \renewcommand{\eqref}[1]{\textup{{\normalfont Eq.~(\ref{#1}}\normalfont)}}
 
 \RequirePackage{doi} % DOIs
-\RequirePackage[nottoc,numbib]{tocbibind} % References section in TOC (for SI)
+\RequirePackage[nottoc]{tocbibind} % References section in TOC (for SI)
 
 %%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%% Other Setup
