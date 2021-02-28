@@ -59,7 +59,7 @@
 
 % Fonts
 \RequirePackage{lmodern}
-\RequirePackage[scaled]{helvet}
+\renewcommand*\familydefault{\sfdefault}
 
 % Microtype
 \AtEndOfClass{\RequirePackage{microtype}}
@@ -224,6 +224,7 @@
 \sisetup{
   detect-weight=true,
   detect-family=true,
+  per-mode=reciprocal,
   range-units=single,       % brief SIrange
   range-phrase=--           % and using lines
 }
@@ -254,13 +255,14 @@
 }{
   \IfFileExists{pi-bib.bst}{
   \bibliographystyle{pi-bib}
-}{
+  }{
     \PackageWarning{pi-bib}{templates/pi/pi-bib.bst not found; must specify manually}
+    \bibliographystyle{unsrt}
 }}
 %% set Bibliography font to be sans serif
 \renewcommand\bibfont{\normalfont\sffamily\fontsize{6}{8}\selectfont} 
 %% Use "References" as title
-\renewcommand{\refname}{References} 
+\renewcommand{\refname}{References}
 %% Remove brackets from label
 \renewcommand\@biblabel[1]{ #1.}
 
@@ -341,7 +343,7 @@ x}
 \newcommand{\leadauthor}[1]{\def\@leadauthor{#1}}             % lead (first) author
 \newcommand{\equalcontrib}[1]{\def\@equalcontrib{#1}}         % equal contribution switch
 \newcommand{\acknow}[1]{\def\@acknow{#1}}                     % ORCID
-\newcommand{\orcid}[1]{
+\newcommand{\orcid}[1]{                                       % ORCID
   \href{https://orcid.org/#1}{\mbox{
     \begin{tikzpicture}[overlay,remember picture]
       \coordinate (A);
@@ -371,14 +373,16 @@ x}
   \hspace{7pt}\textbf{\today}\hspace{7pt}|%                             % add date
   \hspace{7pt}\textbf{\thepage}}                                        % add page number
 \fancyfoot[L]{%                                                         % footer left side
-\footerfont\@ifundefined{@leadauthor}{}{\@leadauthor}%                  % lead author name
-\ifnum \value{authors} > 1\textit{ et al.}\fi%                          % and et.al.
+  \footerfont\@ifundefined{@pubdoi}{}{%
+      \href{https://dx.doi.org/\@pubdoi}{DOI: \@pubdoi}}                % add DOI + hyperlink
+% \footerfont\@ifundefined{@leadauthor}{}{\@leadauthor}%                  % lead author name
+% \ifnum \value{authors} > 1\textit{ et al.}\fi%                          % and et.al.
 }
 
 % Modifying the plain style (applied automatically with title page)
 \fancypagestyle{plain}{%
     \fancyhf{}                                                          % clear everything
-    \iftoggle{toprule}{%                                    % if SI, we add a top rule
+    \iftoggle{toprule}{%                                                % if SI, we add a top rule
         \fancyhead[L]{%                                                 % Add article type and rule
           \colorbox{black}{\parbox{18em}{\centering\color{white}\subtitlefont{\arttype}}}}
         \renewcommand{\headrulewidth}{3pt}%
