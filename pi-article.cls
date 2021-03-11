@@ -181,7 +181,7 @@
 
 \RequirePackage{float}                        % improved interface for floating objects
 \RequirePackage{dblfloatfix}                  % fixes for twocolumn floats
-\RequirePackage[section]{placeins}            % for the floatbarrier macro
+\RequirePackage{placeins}            % for the floatbarrier macro
 
 % distance between floats and text
 \setlength{\textfloatsep}{6pt \@plus 2.0pt \@minus 2.0pt}
@@ -373,7 +373,11 @@ x}
 % Footers
 \renewcommand{\footrulewidth}{0pt}                                      % No footer rule normally
 \fancyfoot[R]{%                                                         % footer right side
-  \footerfont\textit{Preprint}\hspace{7pt}|%                            % add preprint text
+  \iftoggle{shortintro}{
+    \footerfont\textit{Supplementary Information}\hspace{7pt}|%         % we add SI as text
+  }{
+    \footerfont\textit{Preprint}\hspace{7pt}|%                          % we add preprint
+  }
   \hspace{7pt}\textbf{\today}\hspace{7pt}|%                             % add date
   \hspace{7pt}\textbf{\thepage}}                                        % add page number
 \fancyfoot[L]{%                                                         % footer left side
@@ -392,7 +396,11 @@ x}
         \renewcommand{\headrulewidth}{3pt}%
     }{}
     \fancyfoot[R]{                                                      % footer right side
-      \footerfont\textit{Preprint}\hspace{7pt}|%                        % we also add preprint as text
+    \iftoggle{shortintro}{
+      \footerfont\textit{Supplementary Information}\hspace{7pt}|%       % we add SI as text
+    }{
+      \footerfont\textit{Preprint}\hspace{7pt}|%       % we add preprint
+    }
       \hspace{7pt}\textbf{\today}\hspace{7pt}|%                         % add date
       \hspace{7pt}\textbf{\thepage\textendash\pageref{LastPage}}}       % add page number
     \fancyfoot[L]{\footerfont\@ifundefined{@pubdoi}{}{%                 % footer left side
