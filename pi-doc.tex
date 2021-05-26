@@ -12,5 +12,7 @@
 \maketitle
 
 \makeatletter\if@switchSI\else
+\@ifundefined{pubSI}{}{% else
 \footnotetext{\pubSI}
+}
 \fi\makeatother
