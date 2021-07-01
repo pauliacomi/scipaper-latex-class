@@ -88,6 +88,7 @@
 % Encodings
 \RequirePackage{ifxetex,ifluatex}
 \ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \RequirePackage{cmap}
   \RequirePackage[TS1,T1]{fontenc}
   \RequirePackage[utf8]{inputenc}
 \else % if luatex or xelatex
@@ -445,7 +446,7 @@ x}
   {#1. }
   []
 \titleformat{\subsubsection}[runin]
-  {\sffamily\small\bfseries}
+  {\sffamily\bfseries}
   {\thesubsubsection.}
   {0.5em}
   {#1. }
