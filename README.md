@@ -1,6 +1,6 @@
 Custom Latex class I use for my preprints based off the ``extarticle`` class.
 
-Looks like a modern journal publication There are several options such as:
+Looks like a modern journal publication. There are several options such as:
 
 - single/two column layout, with optimized two-column figures
 - specifying the article type (Article, Communication, Review, Perspective)
