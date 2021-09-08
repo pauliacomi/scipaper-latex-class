@@ -4,8 +4,20 @@
 
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{pi-article}[08/09/2021, v5.0]
+\RequirePackage{etoolbox}         % a necessity
 
 %%%%%%%%%%%%%%%%%%%%%% Class options and conditionals
+
+%% Toggles for various conditions and options
+\newtoggle{SI}                    % switching to SI format
+\newtoggle{shortintro}            % will not include abstract in the title page
+\newtoggle{tocfig}                % small figure next to the abstract
+\newtoggle{twocolumn}             % text will be laid out in two column
+\newtoggle{toprule}               % large line at the top
+\toggletrue{toprule}              % on by default
+\newtoggle{linenumbers}           % including line numbers
+\newtoggle{affiltop}              % author affiliation at the top
+\newtoggle{debug}                 % debugging activated
 
 % Option for type of article
 \newcommand{\arttype}{ARTICLE}
@@ -14,49 +26,36 @@
 \DeclareOption{persp}{\renewcommand{\arttype}{PERSPECTIVE}}
 
 % Option for switching to SI format
-\newif\if@switchSI
-\DeclareOption{SI}{\@switchSItrue}
+\DeclareOption{SI}{\toggletrue{SI}}
 
 % Option for two column format
-\newif\if@switchtwocolumn
 \DeclareOption{twocolumn}{
-  \@switchtwocolumntrue
+  \toggletrue{twocolumn}
   \PassOptionsToClass{twocolumn}{extarticle}
 }
 
 % Option for line numbers
-\newif\if@switchlineno
-\DeclareOption{lineno}{\@switchlinenotrue}
+\DeclareOption{lineno}{\toggletrue{linenumbers}}
 
 % Option for affiliation location
-\newif\if@switchaffil \@switchaffilfalse
-\DeclareOption{affiltop}{\@switchaffiltrue}
+\DeclareOption{affiltop}{\toggletrue{affiltop}}
 
 % Option for toc image
-\newif\if@switchtoc \@switchtocfalse
-\DeclareOption{tocfig}{\@switchtoctrue}
+\DeclareOption{tocfig}{\toggletrue{tocfig}}
 
 % Option for debugging format
-\newif\if@switchdebug
-\DeclareOption{debug}{\@switchdebugtrue}
+\DeclareOption{debug}{\toggletrue{debug}}
 
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{extarticle}}  % pass other options to base class
 \ProcessOptions*\relax                                            % finish options
 \LoadClass{extarticle}
 
-%% Options for individual element switching
-\RequirePackage{etoolbox}         % general utilities
-\newtoggle{shortintro}            % will not include abstract in the title page
-\newtoggle{singlecolumn}          % text will be laid out in a single column
-\newtoggle{toprule}               % large line at the top
-\toggletrue{toprule}              % on by default
-
 %%%%%%%%%%%%%%%%%%%%%% Global settings for SI format
 
-\if@switchSI
+\iftoggle{SI}{
   \togglefalse{toprule}                               % no top rule
   \toggletrue{shortintro}                             % no abstract
-  \toggletrue{singlecolumn}                           % single column
+  \toggletrue{twocolumn}                              % single column
   \def\thepage{S\arabic{page}}                        % pages as S1-SX
   \renewcommand*\thefigure{S\arabic{figure}}          % Figures as Fig. S1
   \renewcommand*\thetable{S\arabic{table}}            % Tables as Table S1
@@ -65,7 +64,7 @@
       \renewcommand*\citenumfont[1]{S#1}%
       \renewcommand*\bibnumfmt[1]{(S#1)}%
   }
-\fi
+}{}
 
 %%%%%%%%%%%%%%%%%%%%%% Fonts and language
 
@@ -132,30 +131,31 @@
   marginparwidth=2cm,                         % margins (used for line numbers)
   marginparsep=5pt,                           % margin separation
   headheight=20pt,                            % header height
-  headsep=0pt,                                % text distance from header
-  footskip=25pt]{geometry}
+  headsep=20pt,                               % text distance from header
+  footskip=25pt
+]{geometry}
 
-\if@switchtwocolumn                           % smaller margins if two-column
+\iftoggle{twocolumn}{                         % smaller margins if two-column
 \geometry{
   top=25pt,bottom=35pt,                       % top/bottom
   left=55pt,right=55pt,                       % left/right
+  headsep=10pt
 }
-\fi
+}{}
 
-\if@switchdebug
+\iftoggle{debug}{
 \geometry{
-  showframe,showcrop,                       % for debugging
+  showframe,showcrop,                         % for debugging
 }
-\fi
+}{}
 
+\setlength{\columnsep}{13.5pt}                % Distance between the two columns of text
+\setlength{\parindent}{12pt}                  % Paragraph indent
 
 \RequirePackage{changepage}                   % change odd/even page at any point
 \RequirePackage{lastpage}                     % Refer to last page of the document
 \RequirePackage{afterpage}                    % execute a command on next page (useful for \clearpage flush)
 \RequirePackage{enumitem}                     % For reducing bullet list item separation
-
-\setlength{\columnsep}{13.5pt}                % Distance between the two columns of text
-\setlength{\parindent}{12pt}                  % Paragraph indent
 
 %%%%%%%%%%%%%%%%%%%%%% Figures, tables, equations and listings
 
@@ -371,7 +371,6 @@ x}
 \newcommand{\contact}[1]{\def\@contact{#1}}                   % contact author
 \newcommand{\leadauthor}[1]{\def\@leadauthor{#1}}             % lead (first) author
 \newcommand{\equalcontrib}[1]{\def\@equalcontrib{#1}}         % equal contribution switch
-\newcommand{\acknow}[1]{\def\@acknow{#1}}                     % ORCID
 \newcommand{\orcid}[1]{                                       % ORCID
   \href{https://orcid.org/#1}{\mbox{
     \begin{tikzpicture}[overlay,remember picture]
@@ -435,15 +434,16 @@ x}
 %%%%%%%%%%%%%%%%%%%%%% Line numbers
 
 % Check switch for line numbers
-\if@switchlineno
-  \iftoggle{singlecolumn}{
-    \RequirePackage{lineno}
-  }{% use lineno in switch mode if doublecolumn
+\iftoggle{linenumbers}{
+  % use lineno in switch mode if doublecolumn
+  \iftoggle{twocolumn}{
     \RequirePackage[switch]{lineno}
+    }{
+    \RequirePackage{lineno}
   }
   \renewcommand\linenumberfont{\normalfont\tiny\sffamily}
   \linenumbers
-\fi
+}{}
 
 %%%%%%%%%%%%%%%%%%%%%% Typesetting
 
@@ -505,25 +505,25 @@ x}
   \noindent
   {%
     \vskip3pt%
-    \if@switchtoc
-      \begin{minipage}{0.59\linewidth}
+    \iftoggle{tocfig}{
+      \begin{minipage}{0.5\linewidth}
         \absfont \theabstract
       \end{minipage}
-      \begin{minipage}[L]{0.4\linewidth}
-        \raggedleft
+      \begin{minipage}{0.4\linewidth}
+        \raggedright
         \IfFileExists{figs/tocfig.png}{% no good way of checking for extension
         \includegraphics[width=0.9\linewidth]{figs/tocfig}}
         {\IfFileExists{figs/tocfig.bmp}{
         \includegraphics[width=0.9\linewidth]{figs/tocfig}}
         {\IfFileExists{figs/tocfig.pdf}{
         \includegraphics[width=0.9\linewidth]{figs/tocfig}}
-        }{\includegraphics[width=0.9\linewidth]{example-image}}}
-      \end{minipage}
-    \else
+        }{\includegraphics[width=2cm]{example-image}}}
+      \end{minipage}%
+    }{
       \begin{minipage}{\linewidth}
         \absfont \theabstract
       \end{minipage}
-    \fi
+    }
   }%
   \vskip10pt%
   \noindent
@@ -551,13 +551,13 @@ x}
 
 %% Command to define an affiliation list in a footnote
 \def\authaffil{%
-  \if@switchaffil
+  \iftoggle{affiltop}{
     \@author\par%
-    \vskip2pt
-  \else
+    % \vskip2pt
+  }{
     \AB@authlist\par
     \protected@xdef\@thanks{\@thanks\protect\footnotetext[\the\c@footnote]{\AB@affillist\newline}}%
-  \fi
+  }
 }
 
 %% Command to define a contact email switch
@@ -603,23 +603,23 @@ x}
 }
 {% else if complete paper
   %
-  \vskip20pt%
+  \vskip10pt%
   %
   {\raggedright\baselineskip=24pt\titlefont \@title\par}%
   %
   \vskip10pt
   %
   % author names / addresses
-  \authaffil{}
+  \raggedright\authaffil{}
   %
   \vskip3pt
   %
   % equal contribution
-  \equalcontribswitch{}
+  \raggedright\equalcontribswitch{}
   % corresponding email
-  \contactswitch{}
+  \raggedright\contactswitch{}
   % abstract / TOC section
-  {\abscontent{}}
+  \raggedright{\abscontent{}}
   %
   \noindent\makebox[\linewidth]{\rule{\linewidth}{0.4pt}}%
   %

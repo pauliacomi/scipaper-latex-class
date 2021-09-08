@@ -8,13 +8,13 @@
 
 \documentclass[
     9pt,            % 8-20pt possible
-    twocolumn,      % switch, use twocolumn layout
+    % twocolumn,      % switch, use twocolumn layout
     commun,         % select between ``article'', ``commun'', ``persp'' and ``review''
     lineno,         % switch, adds line numbering
     tocfig,         % switch, use a TOC figure at the top (place in ./figs)
-    % affiltop,       % switch, put affiliations under authors (instead of footnote)
+    affiltop,       % switch, put affiliations under authors (instead of footnote)
     % SI,             % switch to Supplemental Information format, not compatible with twocolumn
-    % debug,          % switch, add debugging boxes
+    debug,          % switch, add debugging boxes
 ]{pi-article}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -28,17 +28,22 @@
 % Authors, with name (\pubauthX), affiliation (\pubaffilX), ORCID (\orcidX) and email (\authemailX)
 % Can add authors with X = A-K
 % Add an equal contribution flag (\eqcontribX) to mark authors as equally contributed
-\newcommand{\pubauthA}{Paul Iacomi}
+\newcommand{\pubauthA}{Your Namehere}
 \newcommand{\pubaffilA}{a,b}
 \newcommand{\orcidA}{0000-0001-5477-1503}
-\newcommand{\authemailA}{mail@pauliacomi.com}
+\newcommand{\authemailA}{youremail@someinstitute.com}
 \newcommand{\eqcontribA}{}
 
-\newcommand{\pubauthB}{Other Author}
-\newcommand{\pubaffilB}{a}
-\newcommand{\orcidB}{0000-0001-5477-1503}
+\newcommand{\pubauthB}{Second Equal}
+\newcommand{\pubaffilB}{b}
+\newcommand{\orcidB}{0000-0001-0000-0000}
 \newcommand{\authemailB}{other@mail.com}
 \newcommand{\eqcontribB}{}
+
+\newcommand{\pubauthC}{Last Author}
+\newcommand{\pubaffilC}{a}
+\newcommand{\orcidC}{0000-0001-5477-1503}
+\newcommand{\authemailC}{mail@someinstitute.com}
 
 % Institutions/Affiliations
 \newcommand{\pubaddrA}{%
@@ -49,7 +54,7 @@ Institution B, with its other address.
 }
 
 % Corresponding author mail
-\newcommand{\pubemail}{\authemailA}
+\newcommand{\pubemail}{\authemailC}
 
 % The publication abstract
 % No references/commands to be placed in here
@@ -64,8 +69,8 @@ Institution B, with its other address.
 \newcommand{\pubSI}{Electronic Supplementary Information (ESI) available: one
 PDF file with all referenced supporting information.}
 
-% Any kewords to be displayed under the abstract
-\keywords{ keyword1 \sep keyword2 \sep keyword3 \sep keyword4 }
+% % Any kewords to be displayed under the abstract
+% \keywords{ keyword1 \sep keyword2 \sep keyword3 \sep keyword4 }
 
 % Supplementary space between title/abstract and text, if needed
 \newcommand{\pubVadj}{0pt}

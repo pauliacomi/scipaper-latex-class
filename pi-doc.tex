@@ -8,8 +8,7 @@
 
 \maketitle
 
-\makeatletter\if@switchSI\else
+\makeatletter\iftoggle{SI}{}{
 \@ifundefined{pubSI}{}{% else
 \footnotetext{\pubSI}
-}
-\fi\makeatother
+}}\makeatother
