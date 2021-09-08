@@ -3,7 +3,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{pi-article}[16/09/2020, v4.0]
+\ProvidesClass{pi-article}[08/09/2021, v5.0]
 
 %%%%%%%%%%%%%%%%%%%%%% Class options and conditionals
 
@@ -11,10 +11,18 @@
 \newcommand{\arttype}{ARTICLE}
 \DeclareOption{commun}{\renewcommand{\arttype}{COMMUNICATION}}
 \DeclareOption{review}{\renewcommand{\arttype}{REVIEW}}
+\DeclareOption{persp}{\renewcommand{\arttype}{PERSPECTIVE}}
 
 % Option for switching to SI format
 \newif\if@switchSI
 \DeclareOption{SI}{\@switchSItrue}
+
+% Option for two column format
+\newif\if@switchtwocolumn
+\DeclareOption{twocolumn}{
+  \@switchtwocolumntrue
+  \PassOptionsToClass{twocolumn}{extarticle}
+}
 
 % Option for line numbers
 \newif\if@switchlineno
@@ -26,7 +34,11 @@
 
 % Option for toc image
 \newif\if@switchtoc \@switchtocfalse
-\DeclareOption{toc}{\@switchtoctrue}
+\DeclareOption{tocfig}{\@switchtoctrue}
+
+% Option for debugging format
+\newif\if@switchdebug
+\DeclareOption{debug}{\@switchdebugtrue}
 
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{extarticle}}  % pass other options to base class
 \ProcessOptions*\relax                                            % finish options
@@ -47,7 +59,7 @@
   \toggletrue{singlecolumn}                           % single column
   \def\thepage{S\arabic{page}}                        % pages as S1-SX
   \renewcommand*\thefigure{S\arabic{figure}}          % Figures as Fig. S1
-  \renewcommand*\thetable{S\arabic{table}}            % Tables as Tbl. S1
+  \renewcommand*\thetable{S\arabic{table}}            % Tables as Table S1
   \renewcommand*\theequation{S\arabic{equation}}      % Equations as Eq. S1
   \AtBeginDocument{%                                  % Bibliographies as Ref. S1
       \renewcommand*\citenumfont[1]{S#1}%
@@ -115,14 +127,27 @@
 
 \RequirePackage[
   a4paper,includeheadfoot,                    % paper size, head/foot included in geometry
-  % showframe,showcrop,                       % for debugging
-  top=25pt,bottom=35pt,                       % top/bottom
-  left=55pt,right=55pt,                       % left/right
+  top=35pt,bottom=50pt,                       % top/bottom
+  left=75pt,right=75pt,                       % left/right
   marginparwidth=2cm,                         % margins (used for line numbers)
   marginparsep=5pt,                           % margin separation
   headheight=20pt,                            % header height
   headsep=0pt,                                % text distance from header
   footskip=25pt]{geometry}
+
+\if@switchtwocolumn                           % smaller margins if two-column
+\geometry{
+  top=25pt,bottom=35pt,                       % top/bottom
+  left=55pt,right=55pt,                       % left/right
+}
+\fi
+
+\if@switchdebug
+\geometry{
+  showframe,showcrop,                       % for debugging
+}
+\fi
+
 
 \RequirePackage{changepage}                   % change odd/even page at any point
 \RequirePackage{lastpage}                     % Refer to last page of the document
@@ -195,6 +220,7 @@
   labelfont={bf,sf},                          % we bold the caption label
   labelsep=colon,                             % periods after label (Fig. 1:)
   figurename=Fig.,                            % figure will be abbreviated
+  % tablename=Tbl.,                             % table will be abbreviated
 ]{caption}
 % overall font types (excluding label)
 \DeclareCaptionFormat{fmt}{\normalfont\sffamily\fontsize{7}{9}\selectfont#1#2#3}
@@ -262,7 +288,7 @@
 }}
 %% set Bibliography font
 \renewcommand\bibfont{\normalfont\sffamily\fontsize{6}{8}\selectfont}
-%% Use "References" as title
+%% Use "References" as bibliography title
 \renewcommand{\bibname}{References}
 \renewcommand{\refname}{References}
 \AtEndOfClass{
@@ -303,8 +329,6 @@
 
 % Equation reference label has no brackets
 \creflabelformat{equation}{#2\textup{#1}#3}
-% Equation reference text is Eq.
-\renewcommand{\eqref}[1]{\textup{{\normalfont Eq.~(\ref{#1}}\normalfont)}}
 
 \RequirePackage{doi} % DOIs
 \RequirePackage[nottoc]{tocbibind} % References section in TOC (for SI)
@@ -487,12 +511,12 @@ x}
       \end{minipage}
       \begin{minipage}[L]{0.4\linewidth}
         \raggedleft
-        \IfFileExists{figs/toc.png}{% no good way of checking for extension
-        \includegraphics[width=0.9\linewidth]{figs/toc}}
-        {\IfFileExists{figs/toc.bmp}{
-        \includegraphics[width=0.9\linewidth]{figs/toc}}
-        {\IfFileExists{figs/toc.pdf}{
-        \includegraphics[width=0.9\linewidth]{figs/toc}}
+        \IfFileExists{figs/tocfig.png}{% no good way of checking for extension
+        \includegraphics[width=0.9\linewidth]{figs/tocfig}}
+        {\IfFileExists{figs/tocfig.bmp}{
+        \includegraphics[width=0.9\linewidth]{figs/tocfig}}
+        {\IfFileExists{figs/tocfig.pdf}{
+        \includegraphics[width=0.9\linewidth]{figs/tocfig}}
         }{\includegraphics[width=0.9\linewidth]{example-image}}}
       \end{minipage}
     \else
@@ -554,7 +578,7 @@ x}
 \renewcommand{\@maketitle}{%
 \iftoggle{shortintro}
 {% if short intro i.e. SI
-  % patch command to center section
+  % patch author command to center section
   \patchcmd{\@author}{\raggedright}{\centering}{}{}
   %
   \topskip0pt
@@ -565,13 +589,14 @@ x}
   %
   \vskip10pt
   %
+  % author names / addresses
   {\centering\authaffil{}}
   %
   \vskip8pt
   %
-  % equal contribution switch
+  % equal contribution
   {\centering\equalcontribswitch{}}
-  % contact switch
+  % corresponding email
   {\centering\contactswitch{}}
   %
   \vspace*{\fill}%
@@ -584,15 +609,16 @@ x}
   %
   \vskip10pt
   %
+  % author names / addresses
   \authaffil{}
   %
   \vskip3pt
   %
-  % equal contribution switch
+  % equal contribution
   \equalcontribswitch{}
-  % contact switch
+  % corresponding email
   \contactswitch{}
-  % Abstract
+  % abstract / TOC section
   {\abscontent{}}
   %
   \noindent\makebox[\linewidth]{\rule{\linewidth}{0.4pt}}%

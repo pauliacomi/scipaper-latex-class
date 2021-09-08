@@ -1,10 +1,8 @@
-% !TEX root = ../../manuscript.tex
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% In an PI manuscript the preamble contains
 %%      - paper title
-%%      - paper metadata
+%%      - paper metadata (authors/affiliations...)
 %%      - paper abstract
 %%      - paper keywords
 %%      - vertical space adjustment between text and abstract
@@ -66,7 +64,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{abstract}
-    \input{docs/0-abstract}%
+    \pubabstract{}
 \end{abstract}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -81,4 +79,4 @@
 %% ------------------------
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% \verticaladjustment{20pt}
+\ifdef{\pubVadj}{\verticaladjustment{\pubVadj}}{}
