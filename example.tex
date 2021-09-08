@@ -8,13 +8,14 @@
 
 \documentclass[
     9pt,            % 8-20pt possible
-    % twocolumn,      % switch, use twocolumn layout
+    twocolumn,      % switch, use twocolumn layout
     commun,         % select between ``article'', ``commun'', ``persp'' and ``review''
     lineno,         % switch, adds line numbering
     tocfig,         % switch, use a TOC figure at the top (place in ./figs)
-    affiltop,       % switch, put affiliations under authors (instead of footnote)
+    % affiltop,       % switch, put affiliations under authors (instead of footnote)
     % SI,             % switch to Supplemental Information format, not compatible with twocolumn
-    debug,          % switch, add debugging boxes
+    % debug,          % switch, add debugging boxes
+    % draft           % for quick compilations (no figures, references etc)
 ]{pi-article}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -69,8 +70,8 @@ Institution B, with its other address.
 \newcommand{\pubSI}{Electronic Supplementary Information (ESI) available: one
 PDF file with all referenced supporting information.}
 
-% % Any kewords to be displayed under the abstract
-% \keywords{ keyword1 \sep keyword2 \sep keyword3 \sep keyword4 }
+% Any keywords to be displayed under the abstract
+\keywords{ keyword1 \sep keyword2 \sep keyword3 \sep keyword4 }
 
 % Supplementary space between title/abstract and text, if needed
 \newcommand{\pubVadj}{0pt}
@@ -171,7 +172,7 @@ There are no conflicts of interest to declare.
 %% --------------------
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Add bibliography or change this
+% Reference to bib file
 \bibliography{biblio}
 
 % End doc

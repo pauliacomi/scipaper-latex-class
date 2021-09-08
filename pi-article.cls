@@ -276,7 +276,7 @@
 % Bibliography style
 %% No separation between references
 \setlength{\bibsep}{0.0pt}
-%% Use pi-bib.bst as a styla (if available) else fall back to unsrtnat
+%% Use pi-bib.bst as a style (if available) else fall back to unsrtnat
 \IfFileExists{templates/pi/pi-bib.bst}{
   \bibliographystyle{templates/pi/pi-bib}
 }{
@@ -506,18 +506,18 @@ x}
   {%
     \vskip3pt%
     \iftoggle{tocfig}{
-      \begin{minipage}{0.5\linewidth}
+      \begin{minipage}{0.56\linewidth}
         \absfont \theabstract
       \end{minipage}
       \begin{minipage}{0.4\linewidth}
-        \raggedright
+        \raggedleft
         \IfFileExists{figs/tocfig.png}{% no good way of checking for extension
         \includegraphics[width=0.9\linewidth]{figs/tocfig}}
         {\IfFileExists{figs/tocfig.bmp}{
         \includegraphics[width=0.9\linewidth]{figs/tocfig}}
         {\IfFileExists{figs/tocfig.pdf}{
         \includegraphics[width=0.9\linewidth]{figs/tocfig}}
-        }{\includegraphics[width=2cm]{example-image}}}
+        }{\includegraphics[width=0.9\linewidth]{example-image}}}
       \end{minipage}%
     }{
       \begin{minipage}{\linewidth}
