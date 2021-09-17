@@ -54,6 +54,7 @@
 ENTRY
   { address
     author
+    assignee
     booktitle
     chapter
     doi
@@ -68,6 +69,7 @@ ENTRY
     month
     note
     number
+    nationality
     organization
     pages
     publisher
@@ -80,12 +82,13 @@ ENTRY
   }
   {}
   { label extra.label sort.label short.list }
-INTEGERS { output.state before.all mid.sentence after.sentence after.block }
+INTEGERS { output.state before.all mid.sentence after.sentence after.block after.item }
 FUNCTION {init.state.consts}
 { #0 'before.all :=
   #1 'mid.sentence :=
   #2 'after.sentence :=
   #3 'after.block :=
+  #4 'after.item :=
 }
 STRINGS { s t}
 FUNCTION {output.nonnull}
@@ -287,6 +290,9 @@ FUNCTION {bbl.mthesis}
 
 FUNCTION {bbl.phdthesis}
 { "Ph.D. thesis" }
+
+FUNCTION {bbl.patent}
+{ "patent" }
 
 MACRO {jan} {"Jan."}
 
@@ -570,7 +576,7 @@ FUNCTION {format.note}
 FUNCTION {format.title}
 { title
   duplicate$ empty$ 'skip$
-    { "t" change.case$ }
+    { }
   if$
   "title" bibinfo.check
   duplicate$ empty$ 'skip$
@@ -725,6 +731,10 @@ FUNCTION {word.in}
 { bbl.in capitalize
   " " * }
 
+FUNCTION {word.patent}
+{ bbl.patent capitalize
+  " " * }
+
 FUNCTION {format.date}
 { year "year" bibinfo.check duplicate$ empty$
     {
@@ -833,6 +843,13 @@ FUNCTION {format.pages}
       * *
     }
   if$
+}
+FUNCTION {format.patent.number}
+{ nationality missing$
+  { word.patent }
+  { nationality " " * word.patent * }
+  if$
+  number *
 }
 FUNCTION {format.journal.pages}
 { pages duplicate$ empty$ 'pop$
@@ -1027,6 +1044,30 @@ FUNCTION {article}
     }
   if$
   format.doi output
+  new.block
+  format.note output
+  fin.entry
+}
+FUNCTION {patent}
+{ output.bibitem
+  assignee missing$
+    { format.authors "author and assignee" output.check }
+    { author missing$
+        { assignee "assignee" output.check }
+        {
+          format.authors "author" output.check
+          author format.key output
+        }
+      if$
+    }
+  if$
+  new.block
+  format.title "title" output.check
+  new.block
+  format.date "year" output.check
+  date.block
+  new.block
+  format.patent.number "number" output.check
   new.block
   format.note output
   fin.entry
