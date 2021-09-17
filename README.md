@@ -9,6 +9,7 @@ Looks like a modern journal publication. There are several options such as:
 - authors designated as "equal contribution"
 - line numbering for reviewers
 - a "Supplemental Information" switch for SI generation
+- other convenience style options (link to online DOI, current date, designation as preprint,...)
 
 Check [``example.tex``](example.tex) for a minimal document and
 [``example.pdf``](example.pdf) for how it will (likely) compile.

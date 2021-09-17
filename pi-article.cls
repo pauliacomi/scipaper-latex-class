@@ -17,6 +17,10 @@
 \toggletrue{toprule}              % on by default
 \newtoggle{linenumbers}           % including line numbers
 \newtoggle{affiltop}              % author affiliation at the top
+\newtoggle{footdate}              % add current date in footer
+\toggletrue{footdate}             % on by default
+\newtoggle{footpreprint}          % add a "Preprint" text in footer
+\toggletrue{footpreprint}         % on by default
 \newtoggle{debug}                 % debugging activated
 
 % Option for type of article
@@ -36,6 +40,10 @@
 
 % Option for line numbers
 \DeclareOption{lineno}{\toggletrue{linenumbers}}
+
+% Option for footer
+\DeclareOption{nofootdate}{\togglefalse{footdate}}
+\DeclareOption{nofootprint}{\togglefalse{footpreprint}}
 
 % Option for affiliation location
 \DeclareOption{affiltop}{\toggletrue{affiltop}}
@@ -397,12 +405,16 @@ x}
 % Footers
 \renewcommand{\footrulewidth}{0pt}                                      % No footer rule normally
 \fancyfoot[R]{%                                                         % footer right side
-  \iftoggle{shortintro}{
+  \iftoggle{SI}{
     \footerfont\textit{Supplementary Information}\hspace{7pt}|%         % we add SI as text
   }{
-    \footerfont\textit{Preprint}\hspace{7pt}|%                          % we add preprint
+    \iftoggle{footpreprint}{
+      \footerfont\textit{Preprint}\hspace{7pt}|%                        % we add preprint text
+    }{}
   }
-  \hspace{7pt}\textbf{\today}\hspace{7pt}|%                             % add date
+  \iftoggle{footdate}{
+    \hspace{7pt}\textbf{\today}\hspace{7pt}|%                           % add date
+  }{}
   \hspace{7pt}\textbf{\thepage}}                                        % add page number
 \fancyfoot[L]{%                                                         % footer left side
   \footerfont\@ifundefined{@pubdoi}{}{%
@@ -420,12 +432,16 @@ x}
         \renewcommand{\headrulewidth}{3pt}%
     }{}
     \fancyfoot[R]{                                                      % footer right side
-    \iftoggle{shortintro}{
+    \iftoggle{SI}{
       \footerfont\textit{Supplementary Information}\hspace{7pt}|%       % we add SI as text
     }{
-      \footerfont\textit{Preprint}\hspace{7pt}|%       % we add preprint
+      \iftoggle{footpreprint}{
+        \footerfont\textit{Preprint}\hspace{7pt}|%                      % we add preprint text
+      }{}
     }
+    \iftoggle{footdate}{
       \hspace{7pt}\textbf{\today}\hspace{7pt}|%                         % add date
+    }{}
       \hspace{7pt}\textbf{\thepage\textendash\pageref{LastPage}}}       % add page number
     \fancyfoot[L]{\footerfont\@ifundefined{@pubdoi}{}{%                 % footer left side
       \href{https://dx.doi.org/\@pubdoi}{DOI: \@pubdoi}}}               % add DOI + hyperlink
